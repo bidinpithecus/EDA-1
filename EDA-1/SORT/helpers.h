@@ -1,0 +1,1 @@
+// Todas as funções utilizadas no decorrer do programa ficarão neste header
