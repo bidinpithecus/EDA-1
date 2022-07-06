@@ -1,0 +1,2 @@
+language = "bash"
+run = "cd SORT && gcc main.c -o main && clear && ./main"
