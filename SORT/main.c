@@ -1,176 +1,191 @@
 #include <stdio.h>
+#include <string.h>
 #include "sorts.h"
-#define MAX 50
-// VALOR BAIXO PARA TESTES
-// MUDAR DEPOIS PARA 1000
+#define MAX 1000
+#define NUM_RANDOM_ARRAYS 10
 
 int main(void) {
+	srand(time(NULL));
 	int iterations;
-	int arraySize = generateArraySize(MAX);
-	int *auxArr = malloc(sizeof(int) * arraySize);
+	int arraySize = randomNum(MAX);
 	int *v = malloc(sizeof(int) * arraySize);
-	generateRandomArray(auxArr, arraySize, MAX);
-	copyArr(auxArr, v, arraySize);
+	FILE *pAvg;
+	FILE *pBest;
+	FILE *pWorst;
 
+	pAvg = fopen("results/medio.txt", "a");
+	pBest = fopen("results/melhor.txt", "a");
+	pWorst = fopen("results/pior.txt", "a");
 
-	printf("Foi gerado um vetor de %d inteiros que sera ordenado utilizando diferentes metodos de ordenacao\n\n", arraySize);
-	printf("Vetor aleatorio original:\n");
-	printArray(v, arraySize);
+	if(pAvg == NULL) {
+    perror("Erro ao abrir arquivo de caso medio.");
+		exit(-1);
+	}
+	if(pBest == NULL) {
+    perror("Erro ao abrir arquivo de melhor caso.");
+		exit(-1);
+	}
+	if(pWorst == NULL) {
+    perror("Erro ao abrir arquivo de pior caso.");
+		exit(-1);
+	}
+
+	fprintf(pAvg, "%d\t", arraySize);
+	fprintf(pBest, "%d\t", arraySize);
+	fprintf(pWorst, "%d\t", arraySize);
+
+	printf("	Se tratam de vetores de %d inteiros que serao ordenados utilizando diferentes metodos de ordenacao\n", arraySize);
 	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-	printf("Vetor ordenado crescente original:\n");
-	sortedArray(v, arraySize);
-	printArray(v, arraySize);
+	printf("~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+	printf("\n	Para o melhor caso, em que se considera um vetor ordenado crescente, foi gerado um vetor [0..%d]:\n", (arraySize - 1));
 	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+	printf("~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-	printf("Vetor ordenado decrescente original:\n");
-	sortedBackwardsArray(v, arraySize);
-	printArray(v, arraySize);
+	printf("\n	Para o caso medio, em que se considera o conjunto de dados desordenado sem seguir nenhum padrao, foram gerados %d vetores e o numero de iteracoes realizadas para ordena-lo, trata-se de um resultado medio da ordenacao desses %d vetores\n", NUM_RANDOM_ARRAYS, NUM_RANDOM_ARRAYS);
 	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+	printf("~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
+	printf("\n	Para o pior caso, em que se considera um vetor ordenado decrescente, foi gerado um vetor: [%d..0]\n", (arraySize - 1));
+	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+	printf("~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
 	// inicio bubble
-	printf("\nBUBBLE SORT:\n");
+	printf("\n~~~~~~~~~~~~~~~~~~~~~");
+	printf("\n~~~~ BUBBLE SORT ~~~~");
+	printf("\n~~~~~~~~~~~~~~~~~~~~~\n");
 
 	sortedArray(v, arraySize);
 	iterations = bubbleSort(v, arraySize);
-	printf("\n	Para ordenar o vetor previamente ordenado, ([0..%d]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo;\n", iterations);
+	fprintf(pBest, "%d\t", iterations);
+	printf("\n	Melhor caso: %d iteracoes;\n", iterations);
 
-	copyArr(auxArr, v, arraySize);
-	iterations = bubbleSort(v, arraySize);
-	printf("\n	Para o vetor aleatorio, foram necessarias %d iteracoes para ordena-lo;\n", iterations);
+	iterations = iterationsRandomArrays(v, arraySize, MAX, NUM_RANDOM_ARRAYS, bubbleSort);
+	fprintf(pAvg, "%d\t", iterations);
+	printf("\n	Caso medio: %d iteracoes em media;\n", iterations);
 
 	sortedBackwardsArray(v, arraySize);
 	iterations = bubbleSort(v, arraySize);
-	printf("\n	Para o vetor ordenado decrescente, ([%d..0]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo.\n", iterations);
+	fprintf(pWorst, "%d\t", iterations);
+	printf("\n	Pior caso: %d iteracoes.\n", iterations);
 	// fim bubble
 
-
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-	printf("\n~~~ REORDENANDO VETOR ALEATORIO ~~~");
-	copyArr(auxArr, v, arraySize);
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
 	// inicio insertion
-	printf("\nINSERTION SORT:\n");
-
+	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~");
+	printf("\n~~~~ INSERTION SORT ~~~~");
+	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~\n");
+	
 	sortedArray(v, arraySize);
 	iterations = insertionSort(v, arraySize);
-	printf("\n	Para ordenar o vetor previamente ordenado, ([0..%d]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo;\n", iterations);
+	fprintf(pBest, "%d\t", iterations);
+	printf("\n	Melhor caso: %d iteracoes;\n", iterations);
 
-	copyArr(auxArr, v, arraySize);
-	iterations = insertionSort(v, arraySize);
-	printf("\n	Para o vetor aleatorio, foram necessarias %d iteracoes para ordena-lo;\n", iterations);
+	iterations = iterationsRandomArrays(v, arraySize, MAX, NUM_RANDOM_ARRAYS, insertionSort);
+	fprintf(pAvg, "%d\t", iterations);
+	printf("\n	Caso medio: %d iteracoes em media;\n", iterations);
 
 	sortedBackwardsArray(v, arraySize);
 	iterations = insertionSort(v, arraySize);
-	printf("\n	Para o vetor ordenado decrescente, ([%d..0]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo.\n", iterations);
+	fprintf(pWorst, "%d\t", iterations);
+	printf("\n	Pior caso: %d iteracoes.\n", iterations);
 	// fim insertion
 
-
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-	printf("\n~~~ REORDENANDO VETOR ALEATORIO ~~~");
-	copyArr(auxArr, v, arraySize);
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
 	// inicio heap
-	printf("\nHEAP SORT:\n");
+	printf("\n~~~~~~~~~~~~~~~~~~~");
+	printf("\n~~~~ HEAP SORT ~~~~");
+	printf("\n~~~~~~~~~~~~~~~~~~~\n");
 
 	sortedArray(v, arraySize);
 	iterations = heapSort(v, arraySize);
-	printf("\n	Para ordendar o vetor previamente ordenado, ([0..%d]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo;\n", iterations);
+	fprintf(pBest, "%d\t", iterations);
+	printf("\n	Melhor caso: %d iteracoes;\n", iterations);
 
-	copyArr(auxArr, v, arraySize);
-	iterations = heapSort(v, arraySize);
-	printf("\n	Para o vetor aleatorio, foram necessarias %d iteracoes para ordena-lo;\n", iterations);
+	iterations = iterationsRandomArrays(v, arraySize, MAX, NUM_RANDOM_ARRAYS, heapSort);
+	fprintf(pAvg, "%d\t", iterations);
+	printf("\n	Caso medio: %d iteracoes em media;\n", iterations);
 
 	sortedBackwardsArray(v, arraySize);
 	iterations = heapSort(v, arraySize);
-	printf("\n	Para o vetor ordenado inverso, ([%d..0]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo.\n", iterations);
+	fprintf(pWorst, "%d\t", iterations);
+	printf("\n	Pior caso: %d iteracoes.\n", iterations);
 	// fim heap
 
-/*
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-	printf("\n~~~ REORDENANDO VETOR ALEATORIO ~~~");
-	copyArr(auxArr, v, arraySize);
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
 	// inicio merge
-	printf("\n     MERGE SORT:\n");
+	printf("\n~~~~~~~~~~~~~~~~~~~~");
+	printf("\n~~~~ MERGE SORT ~~~~");
+	printf("\n~~~~~~~~~~~~~~~~~~~~\n");
 
 	sortedArray(v, arraySize);
 	iterations = mergeSort(v, arraySize);
-	printf("\nPara o vetor previamente ordenado, ([0..%d]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo;\n", iterations);
+	fprintf(pBest, "%d\t", iterations);
+	printf("\n	Melhor caso: %d iteracoes;\n", iterations);
 
-	copyArr(auxArr, v, arraySize);
-	iterations = mergeSort(v, arraySize);
-	printf("\nPara o vetor aleatorio ordenado, foram necessarias %d iteracoes para ordena-lo;\n", iterations);
+	iterations = iterationsRandomArrays(v, arraySize, MAX, NUM_RANDOM_ARRAYS, mergeSort);
+	fprintf(pAvg, "%d\t", iterations);
+	printf("\n	Caso medio: %d iteracoes em media;\n", iterations);
 
 	sortedBackwardsArray(v, arraySize);
 	iterations = mergeSort(v, arraySize);
-	printf("\nPara o vetor ordenado inverso, ([%d..0]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo.\n", iterations);
+	fprintf(pWorst, "%d\t", iterations);
+	printf("\n	Pior caso: %d iteracoes.\n", iterations);
 	// fim merge
 
-	
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-	printf("\n~~~ REORDENANDO VETOR ALEATORIO ~~~");
-	copyArr(auxArr, v, arraySize);
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-	// inicio quick
-	printf("\n     QUICK SORT:\n");
-
-	sortedArray(v, arraySize);
-	iterations = quickSort(v, arraySize);
-	printf("\nPara o vetor previamente ordenado, ([0..%d]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo;\n", iterations);
-
-	copyArr(auxArr, v, arraySize);
-	iterations = quickSort(v, arraySize);
-	printf("\nPara o vetor aleatorio ordenado, foram necessarias %d iteracoes para ordena-lo;\n", iterations);
-
-	sortedBackwardsArray(v, arraySize);
-	iterations = quickSort(v, arraySize);
-	printf("\nPara o vetor ordenado inverso, ([%d..0]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo.\n", iterations);
-	// fim quick
-
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-	printf("\n~~~ REORDENANDO VETOR ALEATORIO ~~~");
-	copyArr(auxArr, v, arraySize);
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-	// inicio radix
-	printf("\n     HEAP SORT:\n");
-
-	sortedArray(v, arraySize);
-	iterations = radixSort(v, arraySize);
-	printf("\nPara o vetor previamente ordenado, ([0..%d]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo;\n", iterations);
-
-	copyArr(auxArr, v, arraySize);
-	iterations = radixSort(v, arraySize);
-	printf("\nPara o vetor aleatorio ordenado, foram necessarias %d iteracoes para ordena-lo;\n", iterations);
-
-	sortedBackwardsArray(v, arraySize);
-	iterations = radixSort(v, arraySize);
-	printf("\nPara o vetor ordenado inverso, ([%d..0]), ", (arraySize - 1));
-	printf("foram necessarias %d iteracoes para ordena-lo.\n", iterations);
-	// fim radix
-
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-	printf("\n~~~ REORDENANDO VETOR ALEATORIO ~~~");
-	copyArr(auxArr, v, arraySize);
-	printf("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+/*
+ *	PARA CADA METODO ADICIONADO, NÃO ESQUECER DE INCLUIR SEU NOME
+ *	EM CADA ARQUIVO DE TEXTO E AINDA APAGAR OS DADOS ATUAIS
+ *	PARA OS RESULTADOS NO ARQUIVO ESTAREM CORRETOS
 */
 	
+	/*
+	// inicio quick
+	printf("\n~~~~~~~~~~~~~~~~~~~~");
+	printf("\n~~~~ QUICK SORT ~~~~");
+	printf("\n~~~~~~~~~~~~~~~~~~~~\n");
+	
+	sortedArray(v, arraySize);
+	iterations = quickSort(v, arraySize);
+	fprintf(pBest, "%d\t", iterations);
+	printf("\n	Melhor caso: %d iteracoes;\n", iterations);
+
+	iterations = iterationsRandomArrays(v, arraySize, MAX, NUM_RANDOM_ARRAYS, quickSort);
+	fprintf(pAvg, "%d\t", iterations);
+	printf("\n	Caso medio: %d iteracoes em media;\n", iterations);
+
+	sortedBackwardsArray(v, arraySize);
+	iterations = quickSort(v, arraySize);
+	fprintf(pWorst, "%d\t", iterations);
+	printf("\n	Pior caso: %d iteracoes.\n", iterations);
+	// fim quick
+
+	// quando metodo radix implementado, nao esquecer de remover a escrita de nova linha
+	// em cada arquivo `fprintf(fptr, "\n");`
+	// isso alterará a formatação da saída desejada
+	// inicio radix
+	printf("\n~~~~~~~~~~~~~~~~~~~~");
+	printf("\n~~~~ RADIX SORT ~~~~");
+	printf("\n~~~~~~~~~~~~~~~~~~~~\n");
+
+	sortedArray(v, arraySize);
+	iterations = radixSort(v, arraySize);
+	fprintf(pBest, "%d\n", iterations);
+	printf("\n	Melhor caso: %d iteracoes;\n", iterations);
+
+	iterations = iterationsRandomArrays(v, arraySize, MAX, NUM_RANDOM_ARRAYS, radixSort);
+	fprintf(pAvg, "%d\n", iterations);
+	printf("\n	Caso medio: %d iteracoes em media;\n", iterations);
+
+	sortedBackwardsArray(v, arraySize);
+	iterations = radixSort(v, arraySize);
+	fprintf(pWorst, "%d\n", iterations);
+	printf("\n	Pior caso: %d iteracoes.\n", iterations);
+	// fim radix
+*/
+	fprintf(pAvg, "\n");
+	fprintf(pBest, "\n");
+	fprintf(pWorst, "\n");
+	
+	fclose(pAvg);
+	fclose(pBest);
+	fclose(pWorst);
+
 	return 0;
 }
